@@ -4,6 +4,7 @@ Run it to generate and solve a board, or supply the letters of a board to solve.
 
     $ ./boggle.py
     $ ./boggle.py <letters>
+    $ ./boggle.py --min 4 <letters>
 
 For example:
 

@@ -89,10 +89,10 @@ def is_prefix(prefix):
     return PREFIXES.has_key(prefix)
 
 def is_word(word):
-    return DICTIONARY.has_key(word) and len(word) >= MIN_WORD_LENGTH
+    return DICTIONARY.has_key(word)
 
 # Mmmm... recursion.
-def seek_from(row, col, board, words, letters=""):
+def seek_from(row, col, board, min_length, words, letters=""):
     if out_of_bounds(row, col) \
     or already_visited(row, col, board):
         return
@@ -100,19 +100,20 @@ def seek_from(row, col, board, words, letters=""):
     letters = letters + board[row][col]
     mark_visited(row, col, board)
 
-    if is_word(letters):
+    if is_word(letters) \
+    and len(letters) >= min_length:
         words[letters] = True
 
     if is_prefix(letters):
         for delta_row in [-1,0,1]:
             for delta_col in [-1,0,1]:
-                seek_from(row + delta_row, col + delta_col, copy.deepcopy(board), words, letters)
+                seek_from(row + delta_row, col + delta_col, copy.deepcopy(board), min_length, words, letters)
 
-def solve(board):
+def solve(board, min_length):
     found_words = {}
     for row in range(BOARD_SIZE):
         for col in range(BOARD_SIZE):
-            seek_from(row, col, copy.deepcopy(board), found_words)
+            seek_from(row, col, copy.deepcopy(board), min_length, found_words)
     words = found_words.keys()
     words.sort()
     return words
@@ -122,14 +123,18 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
+    min_length = MIN_WORD_LENGTH
+
     if len(argv) > 1:
-        letters = argv[1]
+        if (argv[1] == "--min"):
+            min_length = int(argv[2])
+        letters = argv[-1]
     else:
         letters = None
 
     load_dictionary()
     board = init_board(letters)
-    words = solve(board)
+    words = solve(board, min_length)
 
     print
     print_board(board)
