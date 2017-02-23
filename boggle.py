@@ -3,10 +3,9 @@
 # boggle.py - A simple boggle game solver
 #
 
-import sys, getopt, random, copy
+import sys, argparse, random, copy
 
 BOARD_SIZE = 4
-MIN_WORD_LENGTH = 3
 DICTIONARY = {}
 PREFIXES = {}
 DICE = [
@@ -119,22 +118,15 @@ def solve(board, min_length):
     return words
 
 
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv
-
-    min_length = MIN_WORD_LENGTH
-
-    if len(argv) > 1:
-        if (argv[1] == "--min"):
-            min_length = int(argv[2])
-        letters = argv[-1]
-    else:
-        letters = None
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("letters", nargs="?", help="the letters of the board")
+    parser.add_argument("-m", "--min", type=int, default="3", help="minimum word length")
+    args = parser.parse_args()
 
     load_dictionary()
-    board = init_board(letters)
-    words = solve(board, min_length)
+    board = init_board(args.letters)
+    words = solve(board, args.min)
 
     print
     print_board(board)
